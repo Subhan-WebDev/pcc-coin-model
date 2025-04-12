@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Coin Model Test</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #three-container { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="three-container"></div>
+    <!-- Include Three.js and GLTFLoader from a CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://threejs.org/examples/js/loaders/GLTFLoader.js"></script>
+    <script>
+        // Set up scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 3);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('three-container').appendChild(renderer.domElement);
+        
+        // Add lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5).normalize();
+        scene.add(directionalLight);
+        
+        // Load the coin model
+        const loader = new THREE.GLTFLoader();
+        loader.load(
+            'https://subhan-webdev.github.io/pcc-coin-model/PCC.glb',
+            function (gltf) {
+                const coin = gltf.scene;
+                scene.add(coin);
+                coin.scale.set(1, 1, 1);
+                animate();
+            },
+            undefined,
+            function (error) {
+                console.error('Error loading the model:', error);
+            }
+        );
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            // If you want to rotate the coin, for example:
+            scene.traverse(function (object) {
+                if (object.isMesh) {
+                    object.rotation.y += 0.01;
+                }
+            });
+            renderer.render(scene, camera);
+        }
+        
+        // Handle window resizing
+        window.addEventListener('resize', function () {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
